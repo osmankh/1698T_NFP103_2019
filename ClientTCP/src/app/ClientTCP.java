@@ -17,6 +17,11 @@ public class ClientTCP {
 
     public static void main(String[] args) throws IOException
     {
-	    // TODO
+        Socket l = new Socket("localhost", 2000);
+        System.out.println(l.getLocalSocketAddress());
+        BufferedReader ir = getInput(l);
+        PrintWriter reply = getOutput(l);
+        reply.printf("Bonjour\n"); reply.flush();
+        System.out.println(ir.readLine());
     }
 }
