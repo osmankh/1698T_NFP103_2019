@@ -32,6 +32,7 @@ public class ServerTCP {
         String message = in.readLine();
 
         this.checkMessage(message);
+        this.stop();
     }
 
     public void stop() throws IOException {
