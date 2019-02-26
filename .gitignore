@@ -1,6 +1,8 @@
 ClientTCP/out/*
 ClientTCP/.classpath
 ClientTCP/.project
+ClientTCP/.idea
 ServerTCP/out/*
 ServerTCP/.classpath
 ServerTCP/.project
+ServerTCP/.idea
