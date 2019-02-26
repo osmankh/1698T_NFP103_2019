@@ -30,4 +30,10 @@ public class ClientTCP {
         String resp = in.readLine();
         return resp;
     }
+    
+    public void stop() throws IOException {
+        in.close();
+        out.close();
+        clientSocket.close();
+    }
 }
