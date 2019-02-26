@@ -3,6 +3,7 @@ package app;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
 
 public class ClientTCP {
 	private Socket clientSocket;
@@ -23,6 +24,13 @@ public class ClientTCP {
     	clientSocket = new Socket(ip, port);
         out = this.getOutput();
         in = this.getInput();
+        
+        Scanner scanner = new Scanner(System.in);
+        while(!clientSocket.isClosed()) {
+        	String input = scanner.nextLine();
+        	this.send(input);
+        }
+        scanner.close();
     }
     
     public void send(String msg) throws IOException {
@@ -51,8 +59,5 @@ public class ClientTCP {
     public static void main(String [] args) throws UnknownHostException, IOException {
     	ClientTCP client = new ClientTCP();
     	client.start("127.0.0.1", 2000);
-        client.send("hello server");
-        client.send("Thanks");
-        client.send("_quit");
     }
 }
