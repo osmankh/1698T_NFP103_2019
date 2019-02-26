@@ -34,6 +34,13 @@ public class ServerTCP {
         this.checkMessage(message);
     }
 
+    public void stop() throws IOException {
+        in.close();
+        out.close();
+        clientSocket.close();
+        serverSocket.close();
+    }
+
     private void printServerAddress() {
         System.out.printf("L'adresse de la socket d'serverSocket est %s\n",
                 serverSocket.getLocalSocketAddress());
