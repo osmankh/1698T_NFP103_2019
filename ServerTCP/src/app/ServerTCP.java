@@ -32,7 +32,10 @@ public class ServerTCP {
         String message;
         
         while ((message = in.readLine()) != null) {
-            this.checkMessage(message);	
+            if(!this.checkMessage(message)) {
+            	this.stop();
+            	break;
+            }
         }
     }
 
@@ -53,13 +56,16 @@ public class ServerTCP {
                 clientSocket.getRemoteSocketAddress());
     }
 
-    private void checkMessage(String message) {
+    private boolean checkMessage(String message) {
         if ("hello server".equals(message)) {
             out.println("hello client");
+        }else if("_quit".equals(message)) {
+        	return false;
         }
         else {
             out.println("unrecognised message");
         }
+        return true;
     }
 
     public static void main(String[] args) throws IOException
