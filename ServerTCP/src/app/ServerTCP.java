@@ -22,19 +22,26 @@ public class ServerTCP {
 
     private void start(int port) throws IOException {
         serverSocket = new ServerSocket(port);
-        System.out.printf("L'adresse de la socket d'serverSocket est %s\n",
-                serverSocket.getLocalSocketAddress());
+        this.printServerAddress();
 
         clientSocket = serverSocket.accept();
-
-        System.out.printf("L'adresse de la socket client (remote) est %s\n",
-                clientSocket.getRemoteSocketAddress());
+        this.printClientAddress();
 
         out = this.getOutput(clientSocket);
         in = this.getInput(clientSocket);
         String message = in.readLine();
 
         this.checkMessage(message);
+    }
+
+    private void printServerAddress() {
+        System.out.printf("L'adresse de la socket d'serverSocket est %s\n",
+                serverSocket.getLocalSocketAddress());
+    }
+
+    private void printClientAddress() {
+        System.out.printf("L'adresse de la socket client (remote) est %s\n",
+                clientSocket.getRemoteSocketAddress());
     }
 
     private void checkMessage(String message) {
