@@ -55,16 +55,28 @@ public class ServerTCP {
         System.out.printf("L'adresse de la socket client (remote) est %s\n",
                 clientSocket.getRemoteSocketAddress());
     }
-
+    
+    private void quitClient() {
+    	out.println("bye");
+    	System.out.printf("Client with address %s disconnected!", clientSocket.getRemoteSocketAddress());
+    	try {
+			this.stop();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    
     private boolean checkMessage(String message) {
-        if ("hello server".equals(message)) {
+    	if ("hello server".equals(message)) {
             out.println("hello client");
         }else if("_quit".equals(message)) {
+        	this.quitClient();
         	return false;
         }
         else {
             out.println("unrecognised message");
         }
+        
         return true;
     }
 

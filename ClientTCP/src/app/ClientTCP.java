@@ -16,7 +16,7 @@ public class ClientTCP {
 
     private PrintWriter getOutput() throws IOException
     {
-        return new PrintWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()));
+        return new PrintWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()), true);
     }
     
     public void start(String ip, int port) throws UnknownHostException, IOException {
@@ -25,15 +25,34 @@ public class ClientTCP {
         in = this.getInput();
     }
     
-    public String send(String msg) throws IOException {
+    public void send(String msg) throws IOException {
         out.println(msg);
         String resp = in.readLine();
-        return resp;
+        this.checkResponse(resp);
     }
     
-    public void stop() throws IOException {
+    private void checkResponse(String resp) {
+		System.out.println(resp);
+    	if ("bye".equals(resp)) {
+			try {
+				this.stop();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void stop() throws IOException {
         in.close();
         out.close();
         clientSocket.close();
+    }
+    
+    public static void main(String [] args) throws UnknownHostException, IOException {
+    	ClientTCP client = new ClientTCP();
+    	client.start("127.0.0.1", 2000);
+        client.send("hello server");
+        client.send("Thanks");
+        client.send("_quit");
     }
 }
