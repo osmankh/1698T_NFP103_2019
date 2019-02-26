@@ -2,26 +2,32 @@ package app;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class ClientTCP {
-
-    private static BufferedReader getInput(Socket p) throws IOException
+	private Socket clientSocket;
+    private PrintWriter out;
+    private BufferedReader in;
+    
+    private BufferedReader getInput() throws IOException
     {
-        return new BufferedReader(new InputStreamReader(p.getInputStream()));
+        return new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
     }
 
-    private static PrintWriter getOutput(Socket p) throws IOException
+    private PrintWriter getOutput() throws IOException
     {
-        return new PrintWriter(new OutputStreamWriter(p.getOutputStream()));
+        return new PrintWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()));
     }
-
-    public static void main(String[] args) throws IOException
-    {
-        Socket l = new Socket("localhost", 2000);
-        System.out.println(l.getLocalSocketAddress());
-        BufferedReader ir = getInput(l);
-        PrintWriter reply = getOutput(l);
-        reply.printf("Bonjour\n"); reply.flush();
-        System.out.println(ir.readLine());
+    
+    public void start(String ip, int port) throws UnknownHostException, IOException {
+    	clientSocket = new Socket(ip, port);
+        out = this.getOutput();
+        in = this.getInput();
+    }
+    
+    public String send(String msg) throws IOException {
+        out.println(msg);
+        String resp = in.readLine();
+        return resp;
     }
 }

@@ -1,0 +1,6 @@
+ClientTCP/out/*
+ClientTCP/.classpath
+ClientTCP/.project
+ServerTCP/out/*
+ServerTCP/.classpath
+ServerTCP/.project
