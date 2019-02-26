@@ -20,7 +20,7 @@ public class ServerTCP {
         return new PrintWriter(new OutputStreamWriter(p.getOutputStream()));
     }
 
-    public void start(int port) throws IOException {
+    private void start(int port) throws IOException {
         serverSocket = new ServerSocket(port);
         System.out.printf("L'adresse de la socket d'serverSocket est %s\n",
                 serverSocket.getLocalSocketAddress());
