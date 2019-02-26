@@ -30,8 +30,8 @@ public class ServerTCP {
         System.out.printf("L'adresse de la socket client (remote) est %s\n",
                 clientSocket.getRemoteSocketAddress());
 
-        out = new PrintWriter(clientSocket.getOutputStream(), true);
-        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        out = this.getOutput(clientSocket);
+        in = this.getInput(clientSocket);
         String message = in.readLine();
 
         this.checkMessage(message);
