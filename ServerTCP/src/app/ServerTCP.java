@@ -29,10 +29,11 @@ public class ServerTCP {
 
         out = this.getOutput(clientSocket);
         in = this.getInput(clientSocket);
-        String message = in.readLine();
-
-        this.checkMessage(message);
-        this.stop();
+        String message;
+        
+        while ((message = in.readLine()) != null) {
+            this.checkMessage(message);	
+        }
     }
 
     public void stop() throws IOException {
