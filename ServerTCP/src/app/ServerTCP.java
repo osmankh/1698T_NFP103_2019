@@ -10,12 +10,12 @@ public class ServerTCP {
     private PrintWriter out;
     private BufferedReader in;
 
-    private static BufferedReader getInput(Socket p) throws IOException
+    private BufferedReader getInput(Socket p) throws IOException
     {
         return new BufferedReader(new InputStreamReader(p.getInputStream()));
     }
 
-    private static PrintWriter getOutput(Socket p) throws IOException
+    private PrintWriter getOutput(Socket p) throws IOException
     {
         return new PrintWriter(new OutputStreamWriter(p.getOutputStream()), true);
     }
