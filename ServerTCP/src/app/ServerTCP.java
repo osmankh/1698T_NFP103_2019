@@ -17,7 +17,7 @@ public class ServerTCP {
 
     private static PrintWriter getOutput(Socket p) throws IOException
     {
-        return new PrintWriter(new OutputStreamWriter(p.getOutputStream()));
+        return new PrintWriter(new OutputStreamWriter(p.getOutputStream()), true);
     }
 
     private void start(int port) throws IOException {
