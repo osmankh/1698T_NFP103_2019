@@ -1,8 +1,7 @@
 package app;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 
 public class ServerTCP {
     private ServerSocket serverSocket;
@@ -32,6 +31,7 @@ public class ServerTCP {
         String message;
         
         while ((message = in.readLine()) != null) {
+            System.out.println("Receiving data from client");
             if(!this.checkMessage(message)) {
             	this.stop();
             	break;
@@ -65,7 +65,7 @@ public class ServerTCP {
 			e.printStackTrace();
 		}
     }
-    
+
     private boolean checkMessage(String message) {
     	if ("hello server".equals(message)) {
             out.println("hello client");
@@ -74,7 +74,7 @@ public class ServerTCP {
         	return false;
         }
         else {
-            out.println("unrecognised message");
+            out.printf("unrecognised message %s", message);
         }
         
         return true;
@@ -83,6 +83,8 @@ public class ServerTCP {
     public static void main(String[] args) throws IOException
     {
         ServerTCP server = new ServerTCP();
+        Thread bs = new Thread(new BroadcastingServer());
+        bs.start();
         server.start(2000);
     }
 }
