@@ -60,12 +60,6 @@ public class ServerTCP {
         this.serverEars.add(ear);
     }
 
-//    public void stop() throws IOException {
-//        in.close();
-//        out.close();
-//        clientSocket.close();
-//        serverSocket.close();
-//    }
 //
 //    private void printServerAddress() {
 //        out.printf("L'adresse de la socket d'serverSocket est %s\n",
@@ -75,29 +69,6 @@ public class ServerTCP {
 //    private void printClientAddress() {
 //        out.printf("L'adresse de la socket client (remote) est %s\n",
 //                clientSocket.getRemoteSocketAddress());
-//    }
-//
-//    private void quitClient() {
-//        out.println("bye");
-//        out.printf("Client with address %s disconnected!", clientSocket.getRemoteSocketAddress());
-//        try {
-//            this.stop();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    private boolean checkMessage(String message) {
-//        if ("hello server".equals(message)) {
-//            out.println("hello client");
-//        } else if ("_quit".equals(message)) {
-//            this.quitClient();
-//            return false;
-//        } else {
-//            out.printf("unrecognised message %s", message);
-//        }
-//
-//        return true;
 //    }
 
     public static void main(String[] args) throws IOException {

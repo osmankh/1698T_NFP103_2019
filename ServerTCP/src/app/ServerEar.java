@@ -1,10 +1,12 @@
 package app;
 
+import app.model.Client;
+
 import java.io.*;
 import java.net.Socket;
 
 public class ServerEar extends Thread {
-    protected Socket socket;
+    protected Client client;
     private PrintWriter out;
     private BufferedReader in;
 
@@ -19,30 +21,62 @@ public class ServerEar extends Thread {
     }
 
     public ServerEar(Socket clientSocket) {
-        this.socket = clientSocket;
+        try {
+            this.in = this.getInput(clientSocket);
+            this.out = this.getOutput(clientSocket);
+            this.client = new Client(in.readLine(), clientSocket);
+            System.out.printf("New Client connected => Name : %s", this.client.getName());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void run() {
-        try {
-            in = this.getInput(socket);
-            out = this.getOutput(socket);
-        } catch (IOException e) {
-            return;
-        }
         String line;
         while (true) {
             try {
                 line = in.readLine();
-                if ((line == null) || line.equalsIgnoreCase("QUIT")) {
-                    socket.close();
-                    return;
-                } else {
-                    out.println(line);
+                if(!this.checkMessage(line)) {
+                    this.stopConnection();
+                    break;
                 }
             } catch (IOException e) {
-                e.printStackTrace();
-                return;
+                try {
+                    this.stopConnection();
+                } catch (IOException ignored) {
+                }
+                break;
             }
         }
+    }
+
+    private boolean checkMessage(String message) {
+        if ("hello server".equals(message)) {
+            this.out.println("hello client");
+        } else if ("_quit".equals(message)) {
+            this.quitClient();
+            return false;
+        } else {
+            this.out.printf("unrecognised message %s", message);
+            this.out.println();
+        }
+
+        return true;
+    }
+
+    private void quitClient() {
+        this.out.println("bye");
+        this.out.printf("Client with address %s disconnected!", this.client.getSocket().getRemoteSocketAddress());
+        try {
+            this.stopConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void stopConnection() throws IOException {
+        in.close();
+        this.out.close();
+        this.client.getSocket().close();
     }
 }
