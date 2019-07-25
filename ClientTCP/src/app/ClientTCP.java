@@ -23,7 +23,7 @@ public class ClientTCP {
         return new PrintWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()), true);
     }
     
-    public void start(String ip, int port) throws UnknownHostException, IOException {
+    public void start(String ip, int port) throws IOException {
     	clientSocket = new Socket(ip, port);
         out = this.getOutput();
         in = this.getInput();
@@ -36,23 +36,24 @@ public class ClientTCP {
         this.checkResponse(resp);
     }
 
+    public void sendName(String msg) {
+        out.println(msg);
+    }
+
     public void initUserInput () throws IOException {
         Scanner scanner = new Scanner(System.in);
         System.out.println("TCP Client running...");
         System.out.println("Type _help to start");
         while(isClientRunning) {
             String input = scanner.nextLine();
-            System.out.println(input);
-
             if (clientSocket != null && !clientSocket.isClosed()) {
                 this.send(input);
             }
             this.processInput(input);
-
         }
     }
 
-    private void processInput(String input) throws SocketException {
+    private void processInput(String input) {
         System.out.println("In processing client message");
 
         if (input.startsWith("_fetch")) {
@@ -85,6 +86,7 @@ public class ClientTCP {
 
         try {
             this.start(params[1], 2000);
+            this.sendName(params[2]);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -108,7 +110,7 @@ public class ClientTCP {
         clientSocket.close();
     }
     
-    public static void main(String [] args) throws UnknownHostException, IOException {
+    public static void main(String [] args) throws IOException {
     	ClientTCP client = new ClientTCP();
     	client.initUserInput();
     }
