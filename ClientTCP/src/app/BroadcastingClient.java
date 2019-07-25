@@ -20,16 +20,14 @@ public class BroadcastingClient implements Runnable {
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,
                     InetAddress.getByName("255.255.255.255"), 2001);
             c.send(sendPacket);
-            System.out.println(getClass().getName() + ">>> Request packet sent to: 255.255.255.255 (DEFAULT)");
 
             //Wait for a response
-
             byte[] recvBuf = new byte[15000];
             DatagramPacket receivePacket = new DatagramPacket(recvBuf, recvBuf.length);
             c.receive(receivePacket);
 
             //We have a response
-            System.out.println(getClass().getName() + ">>> Broadcast response from server: " + receivePacket.getAddress().getHostAddress());
+            System.out.println("Available server : " + receivePacket.getAddress().getHostAddress());
 
             /*
              *  NOW you have the server IP in receivePacket.getAddress()

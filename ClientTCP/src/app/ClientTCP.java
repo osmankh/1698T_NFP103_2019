@@ -32,9 +32,7 @@ public class ClientTCP {
     
     public void send(String msg) throws IOException {
         out.println(msg);
-        System.out.println("after sending message to server");
         String resp = in.readLine();
-        System.out.println("after reading response from the server");
         this.checkResponse(resp);
     }
 
@@ -49,11 +47,7 @@ public class ClientTCP {
             if (clientSocket != null && !clientSocket.isClosed()) {
                 this.send(input);
             }
-            System.out.println("After sending to client");
-
             this.processInput(input);
-
-            System.out.println(" after processing client message");
 
         }
     }
