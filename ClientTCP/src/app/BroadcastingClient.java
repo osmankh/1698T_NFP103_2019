@@ -35,7 +35,7 @@ public class BroadcastingClient implements Runnable {
 
             //Close the port!
             c.close();
-
+            System.out.println("Fetching end.");
         } catch (Exception e) {
             e.printStackTrace();
         }

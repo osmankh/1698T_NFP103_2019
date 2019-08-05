@@ -60,7 +60,6 @@ public class ClientTCP {
             System.out.println("Fetching please wait...");
             Thread bc = new Thread(new BroadcastingClient());
             bc.start();
-            System.out.println("Fetching end.");
         } else if (input.startsWith("_connect ")) {
             this.connectToServer(input);
         } else if (input.equals("_help")) {
