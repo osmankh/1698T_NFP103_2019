@@ -73,9 +73,10 @@ public class ClientTCP {
 
     private void printHelp() {
         System.out.println("Type _fetch to fetch all servers ip.");
-        System.out.println("_connect <ip> <nickname>");
-        System.out.println("_quit to exit connected server and close the app");
-        System.out.println("_help to print this message");
+        System.out.println("\t_connect <ip> <nickname>");
+        System.out.println("\t_who to get a list of all connected users.");
+        System.out.println("\t_quit to exit connected server and close the app.");
+        System.out.println("\t_help to print this message.");
     }
 
     private void connectToServer(String input) {

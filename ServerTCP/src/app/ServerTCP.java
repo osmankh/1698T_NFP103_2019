@@ -58,7 +58,11 @@ public class ServerTCP {
         serverEars.forEach(serverEar -> serverEar.notifyUser(message));
     }
 
-    public void removeClient(ServerEar serverEar) {
+    void removeClient(ServerEar serverEar) {
         this.serverEars.remove(serverEar);
+    }
+
+    List<ServerEar> getServerEars() {
+        return this.serverEars;
     }
 }

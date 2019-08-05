@@ -14,13 +14,11 @@ public class ServerEar extends Thread {
     private PrintWriter out;
     private BufferedReader in;
 
-    private BufferedReader getInput(Socket p) throws IOException
-    {
+    private BufferedReader getInput(Socket p) throws IOException {
         return new BufferedReader(new InputStreamReader(p.getInputStream()));
     }
 
-    private PrintWriter getOutput(Socket p) throws IOException
-    {
+    private PrintWriter getOutput(Socket p) throws IOException {
         return new PrintWriter(new OutputStreamWriter(p.getOutputStream()), true);
     }
 
@@ -41,7 +39,7 @@ public class ServerEar extends Thread {
         while (true) {
             try {
                 line = in.readLine();
-                if(!this.checkMessage(line)) {
+                if (!this.checkMessage(line)) {
                     this.stopConnection();
                     break;
                 }
@@ -59,11 +57,18 @@ public class ServerEar extends Thread {
         if ("_quit".equals(message)) {
             this.quitClient();
             return false;
+        } else if ("_who".equals(message)) {
+            this.sendConnectedUsers();
         } else {
             this.serverTCP.sendMessageToAllConnectedUsers(message, this.client);
         }
-
         return true;
+    }
+
+    private void sendConnectedUsers() {
+        final String[] response = {"Connected users: \n"};
+        this.serverTCP.getServerEars().forEach(ServerEar -> response[0] += "\t- " + ServerEar.client.getName() + " ( Address: " + ServerEar.client.getSocket().getInetAddress() + ":" + ServerEar.client.getSocket().getPort() + " )\n");
+        this.out.println(response[0]);
     }
 
     private String getDate() {
