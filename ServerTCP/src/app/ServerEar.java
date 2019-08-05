@@ -4,9 +4,13 @@ import app.model.Client;
 
 import java.io.*;
 import java.net.Socket;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ServerEar extends Thread {
     protected Client client;
+    protected ServerTCP serverTCP;
     private PrintWriter out;
     private BufferedReader in;
 
@@ -20,12 +24,14 @@ public class ServerEar extends Thread {
         return new PrintWriter(new OutputStreamWriter(p.getOutputStream()), true);
     }
 
-    public ServerEar(Socket clientSocket) {
+    public ServerEar(Socket clientSocket, ServerTCP serverTCP) {
         try {
             this.in = this.getInput(clientSocket);
             this.out = this.getOutput(clientSocket);
             this.client = new Client(in.readLine(), clientSocket);
+            this.serverTCP = serverTCP;
             System.out.printf("New Client connected => Name : %s", this.client.getName());
+            System.out.println();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -55,11 +61,16 @@ public class ServerEar extends Thread {
             this.quitClient();
             return false;
         } else {
-            this.out.printf("unrecognised message %s", message);
-            this.out.println();
+            this.serverTCP.sendMessageToAllConnectedUsers(message, this.client);
         }
 
         return true;
+    }
+
+    private String getDate() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date = new Date();
+        return dateFormat.format(date);
     }
 
     private void quitClient() {
@@ -76,5 +87,10 @@ public class ServerEar extends Thread {
         in.close();
         this.out.close();
         this.client.getSocket().close();
+    }
+
+    public void sendMessage(String message, Client client) {
+        this.out.printf("%s : %s > %s", this.getDate(), client.getName(), message);
+        this.out.println();
     }
 }

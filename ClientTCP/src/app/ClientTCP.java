@@ -8,7 +8,7 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 
 public class ClientTCP {
-	private Socket clientSocket;
+    private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
     private boolean isClientRunning = true;
@@ -27,13 +27,17 @@ public class ClientTCP {
     	clientSocket = new Socket(ip, port);
         out = this.getOutput();
         in = this.getInput();
+        this.startClientListener();
         System.out.println("Connected successfully");
     }
-    
+
+    private void startClientListener() {
+        Thread clientEar = new Thread(new ClientEar(this));
+        clientEar.start();
+    }
+
     public void send(String msg) throws IOException {
         out.println(msg);
-        String resp = in.readLine();
-        this.checkResponse(resp);
     }
 
     public void sendName(String msg) {
@@ -54,8 +58,6 @@ public class ClientTCP {
     }
 
     private void processInput(String input) {
-        System.out.println("In processing client message");
-
         if (input.startsWith("_fetch")) {
             System.out.println("Fetching please wait...");
             Thread bc = new Thread(new BroadcastingClient());
@@ -91,9 +93,8 @@ public class ClientTCP {
         }
     }
 
-    private void checkResponse(String resp) {
-		System.out.println(resp);
-    	if ("bye".equals(resp)) {
+    void checkResponse(String resp) {
+    	if ("_quick".equals(resp)) {
 			try {
 				this.stop();
 			} catch (IOException e) {
@@ -108,9 +109,22 @@ public class ClientTCP {
         isClientRunning = false;
         clientSocket.close();
     }
-    
+
+    public Socket getClientSocket() {
+        return clientSocket;
+    }
+
+    public BufferedReader getSocketInput() {
+        return in;
+    }
+
     public static void main(String [] args) throws IOException {
     	ClientTCP client = new ClientTCP();
+    	if (args.length > 2) {
+    	    if (args[0].equals("_connect")) {
+    	        client.connectToServer(String.join(" ", args));
+            }
+        }
     	client.initUserInput();
     }
 }

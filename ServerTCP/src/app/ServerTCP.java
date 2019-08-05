@@ -1,5 +1,7 @@
 package app;
 
+import app.model.Client;
+
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
@@ -10,7 +12,7 @@ import static java.lang.System.out;
 public class ServerTCP {
     private List<ServerEar> serverEars;
 
-    public ServerTCP() {
+    private ServerTCP() {
         this.serverEars = new ArrayList<>();
     }
 
@@ -36,7 +38,7 @@ public class ServerTCP {
     }
 
     private void hireServerEar(Socket socket) {
-        ServerEar ear = new ServerEar(socket);
+        ServerEar ear = new ServerEar(socket, this);
         ear.start();
         this.serverEars.add(ear);
     }
@@ -46,5 +48,9 @@ public class ServerTCP {
         Thread bs = new Thread(new BroadcastingServer());
         bs.start();
         server.start(2000);
+    }
+
+    void sendMessageToAllConnectedUsers(String message, Client client) {
+        serverEars.forEach(serverEar -> serverEar.sendMessage(message, client));
     }
 }

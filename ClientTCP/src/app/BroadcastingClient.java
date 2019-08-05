@@ -14,7 +14,7 @@ public class BroadcastingClient implements Runnable {
 
             /*
              * Try the 255.255.255.255 broadcast
-             * (or use the boradcas address of you network class like 192.168.1.255)
+             * (or use the broadcast address of you network class like 192.168.1.255)
              * port 9100
              */
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length,
