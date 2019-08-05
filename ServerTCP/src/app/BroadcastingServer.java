@@ -26,13 +26,11 @@ public class BroadcastingServer implements Runnable {
         }
 
         void listen() throws IOException {
-            System.out.println("Listening to clients broadcast.");
-
             //Receive a packet
             byte[] recvBuf = new byte[15000];
             DatagramPacket packet = new DatagramPacket(recvBuf, recvBuf.length);
 
-            socket.receive(packet); // This method blocks until a datagram is received
+            socket.receive(packet);
 
             greetBroadcaster(packet);
 

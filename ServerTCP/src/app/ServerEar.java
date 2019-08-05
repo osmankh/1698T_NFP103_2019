@@ -51,9 +51,7 @@ public class ServerEar extends Thread {
     }
 
     private boolean checkMessage(String message) {
-        if ("hello server".equals(message)) {
-            this.out.println("hello client");
-        } else if ("_quit".equals(message)) {
+        if ("_quit".equals(message)) {
             this.quitClient();
             return false;
         } else {

@@ -8,7 +8,6 @@ import java.util.List;
 import static java.lang.System.out;
 
 public class ServerTCP {
-    private ServerSocket serverSocket;
     private List<ServerEar> serverEars;
 
     public ServerTCP() {
@@ -16,24 +15,6 @@ public class ServerTCP {
     }
 
     private void start(int port) {
-//        serverSocket = new ServerSocket(port);
-//        this.printServerAddress();
-//
-//        clientSocket = serverSocket.accept();
-//        this.printClientAddress();
-//
-//        out = this.getOutput(clientSocket);
-//        in = this.getInput(clientSocket);
-//        String message;
-//
-//        while ((message = in.readLine()) != null) {
-//            System.out.println("Receiving data from client");
-//            if(!this.checkMessage(message)) {
-//            	this.stop();
-//            	break;
-//            }
-//        }
-
         ServerSocket serverSocket = null;
         Socket socket = null;
 
@@ -60,18 +41,7 @@ public class ServerTCP {
         this.serverEars.add(ear);
     }
 
-//
-//    private void printServerAddress() {
-//        out.printf("L'adresse de la socket d'serverSocket est %s\n",
-//                serverSocket.getLocalSocketAddress());
-//    }
-//
-//    private void printClientAddress() {
-//        out.printf("L'adresse de la socket client (remote) est %s\n",
-//                clientSocket.getRemoteSocketAddress());
-//    }
-
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         ServerTCP server = new ServerTCP();
         Thread bs = new Thread(new BroadcastingServer());
         bs.start();
