@@ -1,10 +1,7 @@
 package app;
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Scanner;
 
 public class ClientTCP {
@@ -12,6 +9,7 @@ public class ClientTCP {
     private PrintWriter out;
     private BufferedReader in;
     private boolean isClientRunning = true;
+    Thread clientEar;
 
     private BufferedReader getInput() throws IOException
     {
@@ -23,8 +21,8 @@ public class ClientTCP {
         return new PrintWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()), true);
     }
     
-    public void start(String ip, int port) throws IOException {
-    	clientSocket = new Socket(ip, port);
+    private void start(String ip) throws IOException {
+    	clientSocket = new Socket(ip, 2000);
         out = this.getOutput();
         in = this.getInput();
         this.startClientListener();
@@ -32,43 +30,47 @@ public class ClientTCP {
     }
 
     private void startClientListener() {
-        Thread clientEar = new Thread(new ClientEar(this));
+        clientEar = new Thread(new ClientEar(this));
         clientEar.start();
     }
 
-    public void send(String msg) throws IOException {
+    private void send(String msg) {
         out.println(msg);
     }
 
-    public void sendName(String msg) {
+    private void sendName(String msg) {
         out.println(msg);
     }
 
-    public void initUserInput () throws IOException {
+    private void initUserInput() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("TCP Client running...");
         System.out.println("Type _help to start");
         while(isClientRunning) {
             String input = scanner.nextLine();
-            if (clientSocket != null && !clientSocket.isClosed()) {
+            if (clientSocket != null && !clientSocket.isClosed() && !this.processInput(input)) {
                 this.send(input);
             }
-            this.processInput(input);
         }
     }
 
-    private void processInput(String input) {
-        if (input.startsWith("_fetch")) {
+    private boolean processInput(String input) {
+        if (input.equals("_fetch")) {
             System.out.println("Fetching please wait...");
             Thread bc = new Thread(new BroadcastingClient());
             bc.start();
+            return true;
         } else if (input.startsWith("_connect ")) {
             this.connectToServer(input);
-        } else if (input.startsWith("_quit")) {
+            return true;
+        } else if (input.equals("_quit")) {
             this.stopApp();
+            return true;
         } else if (input.equals("_help")) {
             this.printHelp();
+            return true;
         }
+        return false;
     }
 
     private void printHelp() {
@@ -90,7 +92,7 @@ public class ClientTCP {
         System.out.printf("Trying connecting you to %s as %s\n", params[1], params[2]);
 
         try {
-            this.start(params[1], 2000);
+            this.start(params[1]);
             this.sendName(params[2]);
         } catch (IOException e) {
             System.out.printf("[WARN] Their is no running server at %s:%s\n", params[1], 2000);
@@ -98,15 +100,31 @@ public class ClientTCP {
         }
     }
 
-    void checkResponse(String resp) {
+    boolean checkResponse(String resp) {
     	if ("_quit".equals(resp)) {
 			try {
 				this.stop();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
-	}
+			return false;
+		} else if ("_kill".equals(resp)) {
+    	    this.killConnection();
+    	    return false;
+        }
+        return true;
+    }
+
+	private void killConnection() {
+        try {
+            in.close();
+            out.close();
+            clientSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        clientEar.interrupt();
+    }
 
 	private void stop() throws IOException {
         in.close();
@@ -128,7 +146,7 @@ public class ClientTCP {
         return in;
     }
 
-    public static void main(String [] args) throws IOException {
+    public static void main(String [] args) {
     	ClientTCP client = new ClientTCP();
     	if (args.length > 2) {
     	    if (args[0].equals("_connect")) {

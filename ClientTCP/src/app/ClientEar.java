@@ -11,11 +11,14 @@ public class ClientEar implements Runnable {
 
     @Override
     public void run() {
-        while (!clientTCP.getClientSocket().isClosed()) {
+        while (!clientTCP.getClientSocket().isClosed() && clientTCP.getClientSocket().isConnected()) {
             try {
                 String resp = clientTCP.getSocketInput().readLine();
-                clientTCP.checkResponse(resp);
-                System.out.println(resp);
+                if (clientTCP.checkResponse(resp)) {
+                    System.out.println(resp);
+                } else {
+                    break;
+                }
             } catch (IOException e) {
                 try {
                     this.clientTCP.getClientSocket().close();

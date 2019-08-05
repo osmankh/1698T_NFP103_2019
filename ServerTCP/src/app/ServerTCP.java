@@ -28,6 +28,7 @@ public class ServerTCP {
         }
         while (true) {
             try {
+                assert serverSocket != null;
                 socket = serverSocket.accept();
             } catch (IOException e) {
                 out.println("I/O error: " + e);
@@ -45,8 +46,13 @@ public class ServerTCP {
 
     public static void main(String[] args) {
         ServerTCP server = new ServerTCP();
+
         Thread bs = new Thread(new BroadcastingServer());
         bs.start();
+
+        Thread inputHandler = new Thread(new InputHandler(server));
+        inputHandler.start();
+
         server.start(2000);
     }
 
@@ -64,5 +70,14 @@ public class ServerTCP {
 
     List<ServerEar> getServerEars() {
         return this.serverEars;
+    }
+
+    void shutdown() {
+        this.serverEars.forEach(ServerEar::kill);
+        System.exit(1);
+    }
+
+    void killUser(String username) {
+        this.serverEars.forEach(serverEar -> { if (serverEar.client.getName().equals(username)) serverEar.kickUser(); });
     }
 }

@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class ServerEar extends Thread {
     protected Client client;
-    protected ServerTCP serverTCP;
+    private ServerTCP serverTCP;
     private PrintWriter out;
     private BufferedReader in;
 
@@ -22,7 +22,7 @@ public class ServerEar extends Thread {
         return new PrintWriter(new OutputStreamWriter(p.getOutputStream()), true);
     }
 
-    public ServerEar(Socket clientSocket, ServerTCP serverTCP) {
+    ServerEar(Socket clientSocket, ServerTCP serverTCP) {
         try {
             this.in = this.getInput(clientSocket);
             this.out = this.getOutput(clientSocket);
@@ -37,6 +37,10 @@ public class ServerEar extends Thread {
     public void run() {
         String line;
         while (true) {
+            if (!this.client.getSocket().isConnected() || this.client.getSocket().isClosed()) {
+                break;
+            }
+
             try {
                 line = in.readLine();
                 if (!this.checkMessage(line)) {
@@ -54,6 +58,9 @@ public class ServerEar extends Thread {
     }
 
     private boolean checkMessage(String message) {
+        if (message == null) {
+            return false;
+        }
         if ("_quit".equals(message)) {
             this.quitClient();
             return false;
@@ -67,7 +74,16 @@ public class ServerEar extends Thread {
 
     private void sendConnectedUsers() {
         final String[] response = {"Connected users: \n"};
-        this.serverTCP.getServerEars().forEach(ServerEar -> response[0] += "\t- " + ServerEar.client.getName() + " ( Address: " + ServerEar.client.getSocket().getInetAddress() + ":" + ServerEar.client.getSocket().getPort() + " )\n");
+        ServerEar _this = this;
+        this.serverTCP.getServerEars().forEach(ServerEar -> {
+            response[0] += "\t- ";
+            if (ServerEar == _this) {
+                response[0] +=  "Me as " + ServerEar.client.getName();
+            } else {
+                response[0] +=  ServerEar.client.getName();
+            }
+            response[0] += " ( Address: " + ServerEar.client.getSocket().getInetAddress() + ":" + ServerEar.client.getSocket().getPort() + " )\n";
+        });
         this.out.println(response[0]);
     }
 
@@ -87,19 +103,40 @@ public class ServerEar extends Thread {
         this.serverTCP.notifyAllUsers(this.client.getName() + " has been disconnected!");
     }
 
-    public void stopConnection() throws IOException {
+    private void stopConnection() throws IOException {
         in.close();
         this.out.close();
         this.client.getSocket().close();
+        this.interrupt();
         this.serverTCP.removeClient(this);
     }
 
-    public void sendMessage(String message, Client client) {
+    void sendMessage(String message, Client client) {
         this.out.printf("%s : %s > %s", this.getDate(), client.getName(), message);
         this.out.println();
     }
 
-    public void notifyUser(String message) {
+    void notifyUser(String message) {
         this.out.println(message);
+    }
+
+    void kill() {
+        try {
+            this.out.println("[WARN] Your connection closed due to server shutdown.");
+            this.out.println("_kill");
+            this.stopConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void kickUser() {
+        try {
+            this.out.println("[WARN] You have been kicked out.");
+            this.out.println("_kill");
+            this.stopConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
