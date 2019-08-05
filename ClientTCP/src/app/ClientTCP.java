@@ -89,12 +89,13 @@ public class ClientTCP {
             this.start(params[1], 2000);
             this.sendName(params[2]);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.printf("[WARN] Their is no running server at %s:%s\n", params[1], 2000);
+            System.out.println();
         }
     }
 
     void checkResponse(String resp) {
-    	if ("_quick".equals(resp)) {
+    	if ("_quit".equals(resp)) {
 			try {
 				this.stop();
 			} catch (IOException e) {
@@ -108,6 +109,7 @@ public class ClientTCP {
         out.close();
         isClientRunning = false;
         clientSocket.close();
+        System.exit(1);
     }
 
     public Socket getClientSocket() {

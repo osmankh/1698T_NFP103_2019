@@ -17,6 +17,11 @@ public class ClientEar implements Runnable {
                 clientTCP.checkResponse(resp);
                 System.out.println(resp);
             } catch (IOException e) {
+                try {
+                    this.clientTCP.getClientSocket().close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
                 e.printStackTrace();
             }
         }

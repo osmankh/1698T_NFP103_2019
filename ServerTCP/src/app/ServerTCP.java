@@ -53,4 +53,12 @@ public class ServerTCP {
     void sendMessageToAllConnectedUsers(String message, Client client) {
         serverEars.forEach(serverEar -> serverEar.sendMessage(message, client));
     }
+
+    void notifyAllUsers (String message) {
+        serverEars.forEach(serverEar -> serverEar.notifyUser(message));
+    }
+
+    public void removeClient(ServerEar serverEar) {
+        this.serverEars.remove(serverEar);
+    }
 }

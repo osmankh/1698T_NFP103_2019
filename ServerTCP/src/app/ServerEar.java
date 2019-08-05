@@ -30,8 +30,7 @@ public class ServerEar extends Thread {
             this.out = this.getOutput(clientSocket);
             this.client = new Client(in.readLine(), clientSocket);
             this.serverTCP = serverTCP;
-            System.out.printf("New Client connected => Name : %s", this.client.getName());
-            System.out.println();
+            this.serverTCP.notifyAllUsers("New user connected. `Name: " + this.client.getName() + "`");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -74,23 +73,28 @@ public class ServerEar extends Thread {
     }
 
     private void quitClient() {
-        this.out.println("bye");
-        this.out.printf("Client with address %s disconnected!", this.client.getSocket().getRemoteSocketAddress());
+        this.out.println("_quit");
         try {
             this.stopConnection();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.serverTCP.notifyAllUsers(this.client.getName() + " has been disconnected!");
     }
 
     public void stopConnection() throws IOException {
         in.close();
         this.out.close();
         this.client.getSocket().close();
+        this.serverTCP.removeClient(this);
     }
 
     public void sendMessage(String message, Client client) {
         this.out.printf("%s : %s > %s", this.getDate(), client.getName(), message);
         this.out.println();
+    }
+
+    public void notifyUser(String message) {
+        this.out.println(message);
     }
 }
