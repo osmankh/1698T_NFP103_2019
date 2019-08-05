@@ -22,10 +22,9 @@ public class ClientEar implements Runnable {
             } catch (IOException e) {
                 try {
                     this.clientTCP.getClientSocket().close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+                } catch (IOException ignore) {
+
                 }
-                e.printStackTrace();
             }
         }
     }

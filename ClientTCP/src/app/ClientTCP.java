@@ -48,8 +48,13 @@ public class ClientTCP {
         System.out.println("Type _help to start");
         while(isClientRunning) {
             String input = scanner.nextLine();
-            if (clientSocket != null && !clientSocket.isClosed() && !this.processInput(input)) {
+            boolean isInput;
+            if (!(isInput = this.processInput(input)) && clientSocket != null && !clientSocket.isClosed()) {
                 this.send(input);
+            } else {
+                if (!isInput) {
+                    System.out.println("Unrecognized command. type _help to start.");
+                }
             }
         }
     }
@@ -124,6 +129,7 @@ public class ClientTCP {
             e.printStackTrace();
         }
         clientEar.interrupt();
+        clientEar = null;
     }
 
 	private void stop() throws IOException {

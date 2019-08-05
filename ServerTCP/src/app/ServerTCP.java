@@ -5,7 +5,9 @@ import app.model.Client;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.System.out;
 
@@ -74,10 +76,17 @@ public class ServerTCP {
 
     void shutdown() {
         this.serverEars.forEach(ServerEar::kill);
+        this.serverEars.clear();
         System.exit(1);
     }
 
     void killUser(String username) {
-        this.serverEars.forEach(serverEar -> { if (serverEar.client.getName().equals(username)) serverEar.kickUser(); });
+        for (Iterator<ServerEar> iterator = this.serverEars.iterator(); iterator.hasNext();) {
+            ServerEar serverEar = iterator.next();
+            if(serverEar.client.getName().equals(username)) {
+                serverEar.kickUser();
+                iterator.remove();
+            }
+        }
     }
 }

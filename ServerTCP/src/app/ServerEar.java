@@ -45,11 +45,13 @@ public class ServerEar extends Thread {
                 line = in.readLine();
                 if (!this.checkMessage(line)) {
                     this.stopConnection();
+                    this.serverTCP.removeClient(this);
                     break;
                 }
             } catch (IOException e) {
                 try {
                     this.stopConnection();
+                    this.serverTCP.removeClient(this);
                 } catch (IOException ignored) {
                 }
                 break;
@@ -97,6 +99,7 @@ public class ServerEar extends Thread {
         this.out.println("_quit");
         try {
             this.stopConnection();
+            this.serverTCP.removeClient(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -108,7 +111,6 @@ public class ServerEar extends Thread {
         this.out.close();
         this.client.getSocket().close();
         this.interrupt();
-        this.serverTCP.removeClient(this);
     }
 
     void sendMessage(String message, Client client) {
