@@ -10,6 +10,8 @@ public class BroadcastingClient implements Runnable {
             DatagramSocket c = new DatagramSocket();
             c.setBroadcast(true);
 
+            c.setSoTimeout(7000);
+
             byte[] sendData = "SERVER_SCAN".getBytes();
 
             /*
@@ -24,17 +26,21 @@ public class BroadcastingClient implements Runnable {
             //Wait for a response
             byte[] recvBuf = new byte[15000];
             DatagramPacket receivePacket = new DatagramPacket(recvBuf, recvBuf.length);
-            c.receive(receivePacket);
+            try {
+                c.receive(receivePacket);
+                //We have a response
+                System.out.println("Available server : " + receivePacket.getAddress().getHostAddress());
 
-            //We have a response
-            System.out.println("Available server : " + receivePacket.getAddress().getHostAddress());
+                /*
+                 *  NOW you have the server IP in receivePacket.getAddress()
+                 */
 
-            /*
-             *  NOW you have the server IP in receivePacket.getAddress()
-             */
+                //Close the port!
+                c.close();
+            } catch (SocketTimeoutException e) {
+                System.out.println("No responses. (timeout)");
+            }
 
-            //Close the port!
-            c.close();
             System.out.println("Fetching end.");
         } catch (Exception e) {
             e.printStackTrace();
