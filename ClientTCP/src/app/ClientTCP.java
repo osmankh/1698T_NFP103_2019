@@ -64,6 +64,8 @@ public class ClientTCP {
             bc.start();
         } else if (input.startsWith("_connect ")) {
             this.connectToServer(input);
+        } else if (input.startsWith("_quit")) {
+            this.stopApp();
         } else if (input.equals("_help")) {
             this.printHelp();
         }
@@ -72,6 +74,7 @@ public class ClientTCP {
     private void printHelp() {
         System.out.println("Type _fetch to fetch all servers ip.");
         System.out.println("_connect <ip> <nickname>");
+        System.out.println("_quit to exit connected server and close the app");
         System.out.println("_help to print this message");
     }
 
@@ -104,19 +107,23 @@ public class ClientTCP {
 		}
 	}
 
-	public void stop() throws IOException {
+	private void stop() throws IOException {
         in.close();
         out.close();
-        isClientRunning = false;
         clientSocket.close();
+        this.stopApp();
+    }
+
+    private void stopApp() {
+        isClientRunning = false;
         System.exit(1);
     }
 
-    public Socket getClientSocket() {
+    Socket getClientSocket() {
         return clientSocket;
     }
 
-    public BufferedReader getSocketInput() {
+    BufferedReader getSocketInput() {
         return in;
     }
 
