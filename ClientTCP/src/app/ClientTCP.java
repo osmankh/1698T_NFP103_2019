@@ -26,7 +26,7 @@ public class ClientTCP {
         out = this.getOutput();
         in = this.getInput();
         this.startClientListener();
-        System.out.println("Connected successfully");
+        System.out.println("[INFO] Connected successfully");
     }
 
     private void startClientListener() {
@@ -44,8 +44,6 @@ public class ClientTCP {
 
     private void initUserInput() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("TCP Client running...");
-        System.out.println("Type _help to start");
         while(isClientRunning) {
             String input = scanner.nextLine();
             boolean isInput;
@@ -53,7 +51,7 @@ public class ClientTCP {
                 this.send(input);
             } else {
                 if (!isInput) {
-                    System.out.println("Unrecognized command. type _help to start.");
+                    System.out.println("[TYPO] Unrecognized command. type _help to start.");
                 }
             }
         }
@@ -61,7 +59,7 @@ public class ClientTCP {
 
     private boolean processInput(String input) {
         if (input.equals("_fetch")) {
-            System.out.println("Fetching please wait...");
+            System.out.println("[INFO] Fetching please wait...");
             Thread bc = new Thread(new BroadcastingClient());
             bc.start();
             return true;
@@ -69,7 +67,7 @@ public class ClientTCP {
             this.connectToServer(input);
             return true;
         } else if (input.equals("_quit")) {
-            this.stopApp();
+            this.send("_quit");
             return true;
         } else if (input.equals("_help")) {
             this.printHelp();
@@ -79,22 +77,24 @@ public class ClientTCP {
     }
 
     private void printHelp() {
+        System.out.println();
         System.out.println("Type _fetch to fetch all servers ip.");
         System.out.println("\t_connect <ip> <nickname>");
         System.out.println("\t_who to get a list of all connected users.");
         System.out.println("\t_quit to exit connected server and close the app.");
         System.out.println("\t_help to print this message.");
+        System.out.println();
     }
 
     private void connectToServer(String input) {
         String[] params = input.split(" ");
 
         if (params.length < 3) {
-            System.err.println("Missing param, ex: _connect <ip> <username>");
+            System.err.println("[TYPO] Missing param, ex: _connect <ip> <username>");
             return;
         }
 
-        System.out.printf("Trying connecting you to %s as %s\n", params[1], params[2]);
+        System.out.printf("[INFO] Trying connecting you to %s as %s\n", params[1], params[2]);
 
         try {
             this.start(params[1]);
@@ -106,14 +106,11 @@ public class ClientTCP {
     }
 
     boolean checkResponse(String resp) {
-    	if ("_quit".equals(resp)) {
-			try {
-				this.stop();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return false;
-		} else if ("_kill".equals(resp)) {
+        if (resp == null) {
+            return false;
+        }
+
+    	if ("_kill".equals(resp)) {
     	    this.killConnection();
     	    return false;
         }
@@ -128,14 +125,11 @@ public class ClientTCP {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        clientEar.interrupt();
         clientEar = null;
     }
 
-	private void stop() throws IOException {
-        in.close();
-        out.close();
-        clientSocket.close();
+	private void stop() {
+        this.close();
         this.stopApp();
     }
 
@@ -154,11 +148,22 @@ public class ClientTCP {
 
     public static void main(String [] args) {
     	ClientTCP client = new ClientTCP();
+        System.out.println("[INFO] TCP Client running... Type _help to start");
     	if (args.length > 2) {
     	    if (args[0].equals("_connect")) {
     	        client.connectToServer(String.join(" ", args));
             }
         }
     	client.initUserInput();
+    }
+
+    public void close() {
+        try {
+            in.close();
+            out.close();
+            clientSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

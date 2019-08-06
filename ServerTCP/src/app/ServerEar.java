@@ -28,7 +28,8 @@ public class ServerEar extends Thread {
             this.out = this.getOutput(clientSocket);
             this.client = new Client(in.readLine(), clientSocket);
             this.serverTCP = serverTCP;
-            this.serverTCP.notifyAllUsers("New user connected. `Name: " + this.client.getName() + "`");
+            this.serverTCP.notifyAllUsers("[SERVER -> INFO] New user connected. `Name: " + this.client.getName() + "`");
+            System.out.println("[INFO] New connection accepted. [ Username: " + this.client.getName() + " ]");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -51,7 +52,9 @@ public class ServerEar extends Thread {
             } catch (IOException e) {
                 try {
                     this.stopConnection();
+                    System.out.println("[INFO] Connection lost with " + this.client.getName());
                     this.serverTCP.removeClient(this);
+                    this.serverTCP.notifyAllUsers("[SERVER - INFO] Connection lost with " + this.client.getName());
                 } catch (IOException ignored) {
                 }
                 break;
@@ -96,21 +99,21 @@ public class ServerEar extends Thread {
     }
 
     private void quitClient() {
-        this.out.println("_quit");
+        this.out.println("Bye!");
         try {
             this.stopConnection();
             this.serverTCP.removeClient(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.serverTCP.notifyAllUsers(this.client.getName() + " has been disconnected!");
+        System.out.println("[INFO] " + this.client.getName() + " has quit the server.");
+        this.serverTCP.notifyAllUsers("[SERVER -> INFO] " + this.client.getName() + " has quit the chat.");
     }
 
     private void stopConnection() throws IOException {
         in.close();
         this.out.close();
         this.client.getSocket().close();
-        this.interrupt();
     }
 
     void sendMessage(String message, Client client) {
@@ -134,9 +137,10 @@ public class ServerEar extends Thread {
 
     public void kickUser() {
         try {
-            this.out.println("[WARN] You have been kicked out.");
+            this.out.println("[SERVER -> WARN] You have been kicked out.");
             this.out.println("_kill");
             this.stopConnection();
+            System.out.println("[INFO] " + this.client.getName() + " Kicked out.");
         } catch (IOException e) {
             e.printStackTrace();
         }

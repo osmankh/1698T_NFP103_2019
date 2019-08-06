@@ -5,9 +5,7 @@ import app.model.Client;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.System.out;
 
@@ -24,6 +22,8 @@ public class ServerTCP {
 
         try {
             serverSocket = new ServerSocket(port);
+            out.println("[INFO] Server started...");
+            out.println("[INFO] Listening for connections at " + serverSocket.getInetAddress() + ":" + serverSocket.getLocalPort());
         } catch (IOException e) {
             e.printStackTrace();
 
@@ -75,18 +75,24 @@ public class ServerTCP {
     }
 
     void shutdown() {
-        this.serverEars.forEach(ServerEar::kill);
-        this.serverEars.clear();
+        out.println("[INFO] Preparing server for shutdown.");
+        out.println("[INFO] Killing connected users connections.");
+        while (this.serverEars.size() > 0) {
+            this.serverEars.get(0).kill();
+        }
+        out.println("[INFO] All users disconnected.");
+        out.println("[INFO] Shutdown server...");
         System.exit(1);
     }
 
     void killUser(String username) {
-        for (Iterator<ServerEar> iterator = this.serverEars.iterator(); iterator.hasNext();) {
-            ServerEar serverEar = iterator.next();
-            if(serverEar.client.getName().equals(username)) {
-                serverEar.kickUser();
-                iterator.remove();
+        ServerEar earToRemove = null;
+        for (ServerEar serverEar : this.serverEars) {
+            if (serverEar.client.getName().equals(username)) {
+                earToRemove = serverEar;
             }
         }
+        earToRemove.kickUser();
+        this.notifyAllUsers("[SERVER -> INFO] " + earToRemove.client.getName() + " Has been kicked out.");
     }
 }

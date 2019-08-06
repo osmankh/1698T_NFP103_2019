@@ -29,7 +29,7 @@ public class BroadcastingClient implements Runnable {
             try {
                 c.receive(receivePacket);
                 //We have a response
-                System.out.println("Available server : " + receivePacket.getAddress().getHostAddress());
+                System.out.println("[INFO] Available server : " + receivePacket.getAddress().getHostAddress());
 
                 /*
                  *  NOW you have the server IP in receivePacket.getAddress()
@@ -38,10 +38,10 @@ public class BroadcastingClient implements Runnable {
                 //Close the port!
                 c.close();
             } catch (SocketTimeoutException e) {
-                System.out.println("No responses. (timeout)");
+                System.out.println("[WARN] No responses. (timeout)");
             }
 
-            System.out.println("Fetching end.");
+            System.out.println("[INFO] Fetching end.");
         } catch (Exception e) {
             e.printStackTrace();
         }
